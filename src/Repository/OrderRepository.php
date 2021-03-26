@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Order;
+use App\Entity\RealEstates;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,6 +21,37 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+    public function getSpecData($productId){
+        $entityManager = $this->getEntityManager();
+
+//        return $this->createQueryBuilder('p')
+//            ->select('p')
+//                ->join(RealEstates::class,'c', 'WITH','p.id = c.realEstates')
+//                ->where('p.id = :id')
+//                ->setParameter('id', $productId)
+//                ->getQuery()->getResult();
+
+        $query = $entityManager->createQuery(
+            'SELECT p, c
+            FROM App\Entity\Order p
+            INNER JOIN p.realEstates c
+            WHERE p.id = :id'
+        )->setParameter('id', $productId);
+
+        return $query->getOneOrNullResult();
+    }
+
+    public function getAllData(){
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT p, c
+            FROM App\Entity\Order p
+            INNER JOIN p.realEstates c'
+        );
+
+        return $query->getArrayResult();
+    }
     // /**
     //  * @return Order[] Returns an array of Order objects
     //  */

@@ -2,11 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Order;
-use App\Entity\RealEstates;
-use App\Service\ApiGetAllService;
-use App\Service\ApiGetSingleService;
-use App\Service\ApiPostService;
+use App\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,27 +14,33 @@ class MainController extends AbstractController
     /**
      * @Route("/post", name="post_data", methods={"POST"})
      * @param Request $request
-     * @param ApiPostService $apiPostService
+     * @param OrderService $orderService
      * @return JsonResponse
      */
-    public function index(Request $request, ApiPostService $apiPostService): JsonResponse
+    public function index(Request $request, OrderService $orderService): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true, JSON_THROW_ON_ERROR);
 
-        $apiPostService->postData($data);
+        if (isset($data['id'])) {
+            $info = $orderService->postData($data);
+        } else {
+            foreach ($data as $datum) {
+                $info = $orderService->postData($datum);
+            }
+        }
 
-        return new JsonResponse(['status' => 'Order created!'], Response::HTTP_CREATED);
+        return new JsonResponse($info, Response::HTTP_CREATED);
     }
 
     /**
      * @Route ("/get/{id}", name="gat_data", methods={"GET"})
      * @param $id
-     * @param ApiGetSingleService $apiGetSingleService
+     * @param OrderService $orderService
      * @return JsonResponse
      */
-    public function getSpecData($id, ApiGetSingleService $apiGetSingleService): JsonResponse
+    public function getSpecData($id, OrderService $orderService): JsonResponse
     {
-        $data = $apiGetSingleService->getSingleData($id);
+        $data = $orderService->getSingleData($id);
 
 
         return new JsonResponse($data, Response::HTTP_OK);
@@ -46,15 +48,13 @@ class MainController extends AbstractController
 
     /**
      * @Route ("/get", name="get_all_data", methods={"GET"})
-     * @param ApiGetAllService $apiGetAllService
+     * @param OrderService $orderService
      * @return JsonResponse
      */
-    public function getAllData(ApiGetAllService $apiGetAllService): JsonResponse
+    public function getAllData(OrderService $orderService): JsonResponse
     {
-
-        $getAllData = $apiGetAllService->getAllData();
+        $getAllData = $orderService->getAllData();
 
         return new JsonResponse($getAllData, Response::HTTP_OK);
-
     }
 }

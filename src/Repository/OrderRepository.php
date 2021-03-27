@@ -21,15 +21,9 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-    public function getSpecData($productId){
+    public function getSpecData($productId)
+    {
         $entityManager = $this->getEntityManager();
-
-//        return $this->createQueryBuilder('p')
-//            ->select('p')
-//                ->join(RealEstates::class,'c', 'WITH','p.id = c.realEstates')
-//                ->where('p.id = :id')
-//                ->setParameter('id', $productId)
-//                ->getQuery()->getResult();
 
         $query = $entityManager->createQuery(
             'SELECT p, c
@@ -41,7 +35,8 @@ class OrderRepository extends ServiceEntityRepository
         return $query->getOneOrNullResult();
     }
 
-    public function getAllData(){
+    public function getAllData()
+    {
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(

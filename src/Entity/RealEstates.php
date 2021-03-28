@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RealEstatesRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=RealEstatesRepository::class)
@@ -19,11 +20,13 @@ class RealEstates
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $type;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank
      */
     private $description;
 

@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Entity\RealEstates;
 use Doctrine\ORM\EntityManagerInterface;
 use MongoDB\Driver\Exception\Exception;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class OrderService
 {
@@ -14,10 +15,15 @@ class OrderService
      */
     private $em;
 
-//Prepare the Entity Manager Interface to use it in the service
-    public function __construct(EntityManagerInterface $em)
+    /**
+     * @var ValidatorInterface
+     */
+    private ValidatorInterface $validator;
+
+    public function __construct(EntityManagerInterface $em, ValidatorInterface $validator)
     {
         $this->em = $em;
+        $this->validator = $validator;
     }
 
 //    Post the data given in the Json
@@ -32,21 +38,31 @@ class OrderService
             ->setAssignee($data['assignee'])
             ->setInspectionDate($data['inspectionDate']);
 
+        $errorsOrder = $this->validator->validate($order);
+
 //        If multiple realEstates exist than relate than to te order
         foreach ($rs as $rsData) {
             $realEstate = new RealEstates();
             $realEstate->setType($rsData['type'])
                 ->setDescription($rsData['description']);
 
+            $errorsRealEstate = $this->validator->validate($realEstate);
+
             // relates this RealEstate to the Order
             $order->addRealEstate($realEstate);
             $this->em->persist($realEstate);
         }
+        if (count($errorsRealEstate) > 0 || count($errorsOrder) > 0) {
+            $errorsString [] = (string)$errorsOrder;
+            $errorsString [] = (string)$errorsRealEstate;
 
-        $this->em->persist($order);
-        $this->em->flush();
+            return "Order not created due to some fields being empty. Please check your Json Request";
+        } else {
+            $this->em->persist($order);
+            $this->em->flush();
 
-        return 'Order Created!';
+            return 'Order Created!';
+        }
     }
 
     public function getSingleData($id): array

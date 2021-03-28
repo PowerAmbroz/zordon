@@ -23,6 +23,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getSpecData($productId)
     {
+//        Get the data for the specyfic ID
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
@@ -37,6 +38,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getAllData()
     {
+//        Get all the data
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(

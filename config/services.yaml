@@ -30,5 +30,6 @@ services:
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
 
+  #Allow the Entity Manager to be used in Service
   App\Service\OrderService:
     arguments: [ '@doctrine.orm.entity_manager' ]
